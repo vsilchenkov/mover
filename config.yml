@@ -1,0 +1,6 @@
+IntervalMinSec: 30
+IntervalMaxSec: 90
+MovePixels: 2
+IdleThresholdSec: 30
+SkipWhenUserActive: true
+KeepScreenAwake: true

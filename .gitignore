@@ -1,0 +1,17 @@
+*.exe
+*.exe~
+*.dll
+*.log
+.idea
+
+# Конфиги отладки в .vscode/ версионируются намеренно — они часть проекта.
+
+# Test binary, built with `go test -c`
+*.test
+
+# Покрытие
+coverage.out
+coverage.html
+
+# Ресурс версии Windows — генерируется goversioninfo при сборке
+*.syso

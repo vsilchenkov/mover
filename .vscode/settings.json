@@ -1,0 +1,39 @@
+{
+    // Mover — настройки рабочей области.
+
+    // Главное здесь. Пакеты fyne собираются через cgo, поэтому и gopls,
+    // и отладчик обязаны видеть gcc из MSYS2 раньше того, что лежит
+    // в составе Git: иначе cc1.exe подхватит чужие libgmp/libwinpthread,
+    // упадёт с 0xC0000139, и подсветка «сломается» по всему проекту
+    // с невнятным "could not import".
+    "go.toolsEnvVars": {
+        "PATH": "C:\\msys64\\mingw64\\bin;${env:PATH}",
+        "CGO_ENABLED": "1"
+    },
+
+    "go.delveConfig": {
+        "showGlobalVariables": false,
+        "debugAdapter": "dlv-dap"
+    },
+
+    // Линтер: golangci-lint v2.12.x, конфиг — .golangci.yml в корне.
+    // Установка: go install github.com/golangci/golangci-lint/v2/cmd/golangci-lint@v2.12.2
+    "go.lintTool": "golangci-lint",
+    "go.lintOnSave": "package",
+
+    "go.testFlags": ["-v", "-count=1"],
+    // Аппаратные тесты по умолчанию пропускаются: они двигают настоящий курсор.
+    // Чтобы прогнать их из редактора, добавьте сюда "MOVER_HW_TEST": "1".
+    "go.testEnvVars": {},
+
+    "go.formatTool": "gofmt",
+    "editor.formatOnSave": true,
+
+    // Сгенерированный ресурс версии Windows — не исходник, в поиске мешает.
+    "files.exclude": {
+        "**/*.syso": true
+    },
+    "search.exclude": {
+        "**/*.exe": true
+    }
+}

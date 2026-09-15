@@ -1,0 +1,115 @@
+{
+    // Mover — конфигурации отладки в VS Code.
+    //
+    // Три вещи, важные именно для этого проекта:
+    //
+    // 1. "output" собирает бинарник в корень проекта, а не во временный каталог
+    //    отладчика. Приложение ищет config.yml и app.log рядом с exe
+    //    (os.Executable, не рабочий каталог), поэтому без этого под отладкой
+    //    оно работало бы на значениях по умолчанию и сохраняло настройки
+    //    куда-то в %TEMP%.
+    //
+    // 2. Отладочная сборка идёт без -H=windowsgui, то есть с консолью, а флаг
+    //    -debug направляет лог в stdout вместо файла. Смотреть его в панели
+    //    "Terminal" (console: integratedTerminal).
+    //
+    // 3. Приложение допускает единственный экземпляр. Если mover.exe уже
+    //    запущен, отладочный процесс просто попросит его показать окно
+    //    и завершится — закройте работающий экземпляр перед стартом отладки.
+    //
+    // PATH с MSYS2 впереди нужен для cgo: без него cc1.exe подхватит старые
+    // DLL из состава Git и упадёт с "cgo.exe: exit status 2". Системный PATH
+    // уже исправлен, но VS Code, запущенный до этой правки, помнит прежний.
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "Mover (окно)",
+            "type": "go",
+            "request": "launch",
+            "mode": "auto",
+            "cwd": "${workspaceFolder}",
+            "program": "${workspaceFolder}/cmd/mover",
+            "output": "${workspaceFolder}/mover-debug.exe",
+            "args": ["-debug"],
+            "console": "integratedTerminal",
+            "env": {
+                "PATH": "C:\\msys64\\mingw64\\bin;${env:PATH}"
+            }
+        },
+        {
+            "name": "Mover (как из автозагрузки: сразу в трей)",
+            "type": "go",
+            "request": "launch",
+            "mode": "auto",
+            "cwd": "${workspaceFolder}",
+            "program": "${workspaceFolder}/cmd/mover",
+            "output": "${workspaceFolder}/mover-debug.exe",
+            // Окно не показывается — приложение живёт в трее. Остановить можно
+            // кнопкой Stop на панели отладки или пунктом "Закрыть" в меню трея.
+            "args": ["-debug", "-autostart"],
+            "console": "integratedTerminal",
+            "env": {
+                "PATH": "C:\\msys64\\mingw64\\bin;${env:PATH}"
+            }
+        },
+        {
+            "name": "genicon (перерисовать иконки)",
+            "type": "go",
+            "request": "launch",
+            "mode": "auto",
+            "cwd": "${workspaceFolder}",
+            "program": "${workspaceFolder}/cmd/genicon",
+            "args": ["-out", "assets"],
+            "console": "integratedTerminal",
+            "env": {
+                "PATH": "C:\\msys64\\mingw64\\bin;${env:PATH}"
+            }
+        },
+        {
+            "name": "Тесты: текущий файл",
+            "type": "go",
+            "request": "launch",
+            "mode": "test",
+            "program": "${fileDirname}",
+            "args": ["-test.v"],
+            "env": {
+                "PATH": "C:\\msys64\\mingw64\\bin;${env:PATH}"
+            }
+        },
+        {
+            "name": "Тесты: аппаратные (двигают настоящий курсор)",
+            "type": "go",
+            "request": "launch",
+            "mode": "test",
+            "program": "${workspaceFolder}/internal/mouse",
+            // Без MOVER_HW_TEST эти тесты пропускаются: они дёргают реальный
+            // курсор и требуют доступа к рабочему столу.
+            "args": ["-test.v", "-test.run", "TestJiggle"],
+            "env": {
+                "MOVER_HW_TEST": "1",
+                "PATH": "C:\\msys64\\mingw64\\bin;${env:PATH}"
+            }
+        },
+        {
+            "name": "Тесты: вёрстка окна (рендер в PNG)",
+            "type": "go",
+            "request": "launch",
+            "mode": "test",
+            "program": "${workspaceFolder}/internal/ui",
+            // Рисует окно программным рендерером и складывает картинки
+            // в %TEMP%\mover-<тема>-<состояние>.png — экран для этого не нужен.
+            "args": ["-test.v", "-test.run", "TestRenderVariants"],
+            "env": {
+                "PATH": "C:\\msys64\\mingw64\\bin;${env:PATH}"
+            }
+        },
+        {
+            "name": "Подключиться к процессу mover.exe",
+            "type": "go",
+            "request": "attach",
+            "mode": "local",
+            // 0 — VS Code предложит выбрать процесс из списка.
+            "processId": 0
+        }
+    ]
+}

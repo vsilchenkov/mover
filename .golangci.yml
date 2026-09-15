@@ -1,0 +1,90 @@
+# Конфигурация golangci-lint для mover.
+#
+# Схема version: "2" — под golangci-lint v2.12.x.
+# Установка: go install github.com/golangci/golangci-lint/v2/cmd/golangci-lint@v2.12.2
+version: "2"
+
+run:
+  modules-download-mode: readonly
+  tests: true
+
+linters:
+  default: none
+  enable:
+    - errcheck
+    - govet
+    - ineffassign
+    - misspell
+    # modernize — тот же анализатор, что подсказывает в редакторе через gopls.
+    - modernize
+    - nilerr
+    - prealloc
+    - revive
+    - staticcheck
+    - unconvert
+    - unused
+  settings:
+    errcheck:
+      check-blank: false
+      exclude-functions:
+        - (io.Closer).Close
+        - (*os.File).Close
+        # Освобождение дескрипторов при завершении: реагировать на ошибку
+        # уже поздно и незачем.
+        - golang.org/x/sys/windows.CloseHandle
+        - golang.org/x/sys/windows.SetEvent
+        # LazyProc.Call всегда возвращает не-nil error (это последний
+        # GetLastError, а не признак сбоя), поэтому судить о результате
+        # можно только по возвращённому значению r1 — оно и проверяется
+        # там, где результат вызова вообще что-то значит.
+        - (*golang.org/x/sys/windows.LazyProc).Call
+    staticcheck:
+      checks:
+        - all
+    revive:
+      rules:
+        - name: var-naming
+        - name: errorf
+        - name: error-return
+        - name: exported
+        - name: package-comments
+        - name: unused-parameter
+          disabled: true
+  exclusions:
+    generated: lax
+    presets:
+      - comments
+      - common-false-positives
+      - legacy
+      - std-error-handling
+    rules:
+      # В тестах допустимы непроверенные ошибки и сборка данных через append
+      # без предварительного выделения ёмкости.
+      - linters:
+          - errcheck
+          - revive
+          - prealloc
+        path: _test\.go
+    paths:
+      - third_party$
+      - builtin$
+      - examples$
+
+issues:
+  max-issues-per-linter: 0
+  max-same-issues: 0
+
+formatters:
+  enable:
+    - gofmt
+    - goimports
+  settings:
+    goimports:
+      local-prefixes:
+        - mover
+  exclusions:
+    generated: lax
+    paths:
+      - third_party$
+      - builtin$
+      - examples$

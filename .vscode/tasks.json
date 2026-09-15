@@ -1,0 +1,76 @@
+{
+    // Mover — типовые операции. Ctrl+Shift+P → "Tasks: Run Task".
+    // Все задачи ходят через make, чтобы не разъезжаться со сборкой из консоли:
+    // именно Makefile подкладывает MSYS2 в начало PATH ради cgo.
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "build: релизный mover.exe",
+            "type": "shell",
+            "command": "make build-win",
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            },
+            "problemMatcher": "$go",
+            "presentation": {
+                "reveal": "always",
+                "panel": "shared"
+            }
+        },
+        {
+            "label": "build: отладочный (с консолью)",
+            "type": "shell",
+            "command": "make build",
+            "group": "build",
+            "problemMatcher": "$go"
+        },
+        {
+            "label": "check: vet + тесты",
+            "type": "shell",
+            "command": "make check",
+            "group": {
+                "kind": "test",
+                "isDefault": true
+            },
+            "problemMatcher": "$go"
+        },
+        {
+            "label": "test: с детектором гонок",
+            "type": "shell",
+            "command": "go test -race -count=1 ./...",
+            "group": "test",
+            "problemMatcher": "$go"
+        },
+        {
+            "label": "test: аппаратные (двигают курсор)",
+            "type": "shell",
+            "command": "go test -count=1 -v -run TestJiggle ./internal/mouse/",
+            "options": {
+                "env": {
+                    "MOVER_HW_TEST": "1"
+                }
+            },
+            "group": "test",
+            "problemMatcher": "$go"
+        },
+        {
+            "label": "lint: golangci-lint",
+            "type": "shell",
+            "command": "make lint",
+            "problemMatcher": "$go"
+        },
+        {
+            "label": "icon: перерисовать иконки",
+            "type": "shell",
+            "command": "make icon",
+            "problemMatcher": []
+        },
+        {
+            "label": "clean: убрать артефакты",
+            "type": "shell",
+            "command": "make clean",
+            "problemMatcher": []
+        }
+    ]
+}

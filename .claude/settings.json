@@ -1,0 +1,11 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(git merge *)",
+      "Bash(mkdir -p \"/c/Users/V3AF4~1.SIL/AppData/Local/Temp/claude/e--git-rep--go-gate-ws/a1c4d327-2047-45b1-9b2d-e0f35cb06086/scratchpad\")",
+      "Bash(mv .claude/settings.json \"/c/Users/V3AF4~1.SIL/AppData/Local/Temp/claude/e--git-rep--go-gate-ws/a1c4d327-2047-45b1-9b2d-e0f35cb06086/scratchpad/settings.json.master.bak\")",
+      "Bash(git push *)",
+      "Bash(git --no-pager log --oneline -1)"
+    ]
+  }
+}
