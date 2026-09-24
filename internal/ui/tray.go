@@ -6,6 +6,7 @@ import (
 
 	"fyne.io/fyne/v2"
 	"fyne.io/fyne/v2/driver/desktop"
+	"fyne.io/systray"
 
 	"mover/internal/jiggler"
 )
@@ -55,7 +56,13 @@ func (a *App) buildTray() {
 	desk.SetSystemTrayMenu(a.tray.menu)
 
 	// Левый клик по иконке показывает окно, правый — открывает меню.
-	desk.SetSystemTrayWindow(a.win)
+	//
+	// SetSystemTrayWindow из fyne здесь не годится. Он подменяет перехват
+	// крестика голым Hide, а по клику показывает окно в обход showWindow —
+	// и windowVisible начинает врать. Окно, убранное крестиком, считается
+	// видимым, блокировка сеанса «прячет» его, а разблокировка возвращает
+	// на экран, хотя пользователь его закрыл.
+	systray.SetOnTapped(func() { fyne.Do(a.showWindow) })
 }
 
 // refreshTray приводит иконку в трее в соответствие с состоянием.
